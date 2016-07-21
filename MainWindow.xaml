@@ -6,7 +6,35 @@
         xmlns:local="clr-namespace:Voxel_Fortress"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
+    <Window.Resources>
+    </Window.Resources>
     <Grid>
-        
+        <TabControl x:Name="tabControl">
+            <TabItem Header="Load Maps">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Image x:Name="elevationMapImage"/>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="heightMapButton" Content="Load Heightmap" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Bottom" Width="auto" Click="heightMapButton_Click"/>
+                        <Button x:Name="exportButton" Content="Export Heightmap" HorizontalAlignment="Right" Margin="10" VerticalAlignment="Bottom" Width="auto" Click="exportButton_Click" IsEnabled="False" Grid.Column="2"/>
+                        <ProgressBar x:Name="exportProgress" Grid.Column="1" Margin="10" Maximum="2048"/>
+                        <TextBlock x:Name="exportLabel" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10" Text="Progress" VerticalAlignment="Stretch" TextAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Select Area">
+                <Grid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
     </Grid>
 </Window>
