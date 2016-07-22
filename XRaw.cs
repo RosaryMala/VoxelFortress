@@ -83,12 +83,12 @@ namespace Voxel_Fortress
             int surface = z + 1;
             for (int zz = 0; zz < surface; zz++)
                 SetIndex(x, y, zz, index);
-            if (surface < 99)
+            if (surface < 100)
             {
                 short waterIndex = (short)_palette.IndexAdd(Color.FromArgb(128, 0, 128, 128));
-                for (int zz = surface; zz < 99; zz++)
+                for (int zz = surface; zz < 100; zz++)
                     SetIndex(x, y, zz, waterIndex);
-                surface = 99;
+                surface = 100;
             }
             for (int zz = surface; zz < Height; zz++)
                 ClearVoxel(x, y, zz);

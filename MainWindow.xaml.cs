@@ -14,9 +14,7 @@ namespace Voxel_Fortress
     {
         MapMaker mapMaker = new MapMaker();
 
-        BitmapImage elevationMap;
-
-        string imageFileName;
+        MapMaker.Images mapImages = new MapMaker.Images();
 
         public MainWindow()
         {
@@ -31,8 +29,10 @@ namespace Voxel_Fortress
 
             if (heightMapDialog.ShowDialog() == true)
             {
-                imageFileName = heightMapDialog.FileName;
-                elevationMap = new BitmapImage(new Uri(heightMapDialog.FileName));
+                mapImages.imageFilename = heightMapDialog.FileName;
+                BitmapImage elevationMap = new BitmapImage(new Uri(heightMapDialog.FileName));
+
+                mapImages.elevationMap = MapMaker.ConvertBitmapImage(elevationMap);
 
                 elevationMapImage.Source = elevationMap;
                 exportButton.IsEnabled = true;
@@ -48,7 +48,7 @@ namespace Voxel_Fortress
             mapExportWorker.DoWork += mapMaker.LoadMap;
             mapExportWorker.ProgressChanged += MapExportWorker_ProgressChanged;
             mapExportWorker.RunWorkerCompleted += MapExportWorker_RunWorkerCompleted;
-            mapExportWorker.RunWorkerAsync(imageFileName);
+            mapExportWorker.RunWorkerAsync(mapImages);
 
             (sender as Button).IsEnabled = false;
         }
@@ -62,6 +62,42 @@ namespace Voxel_Fortress
         {
             exportProgress.Value = e.ProgressPercentage;
             exportLabel.Text = e.UserState as string;
+        }
+
+        private void waterMapButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog heightMapDialog = new OpenFileDialog();
+
+            heightMapDialog.Filter = "Image Files (*.png, *.bmp, *.jpg)|*.png;*.bmp;*.jpg;*.jpeg|All Files (*.*)|*.*";
+
+            if (heightMapDialog.ShowDialog() == true)
+            {
+                //imageFileName = heightMapDialog.FileName;
+                BitmapImage waterMap = new BitmapImage(new Uri(heightMapDialog.FileName));
+
+                mapImages.waterMap = MapMaker.ConvertBitmapImage(waterMap);
+
+                waterMapImage.Source = waterMap;
+                //exportButton.IsEnabled = true;
+            }
+        }
+
+        private void colorMapButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog heightMapDialog = new OpenFileDialog();
+
+            heightMapDialog.Filter = "Image Files (*.png, *.bmp, *.jpg)|*.png;*.bmp;*.jpg;*.jpeg|All Files (*.*)|*.*";
+
+            if (heightMapDialog.ShowDialog() == true)
+            {
+                //imageFileName = heightMapDialog.FileName;
+                BitmapImage colorMap = new BitmapImage(new Uri(heightMapDialog.FileName));
+
+                mapImages.colorMap = MapMaker.ConvertBitmapImage(colorMap);
+
+                colorMapImage.Source = colorMap;
+                //exportButton.IsEnabled = true;
+            }
         }
     }
 }
