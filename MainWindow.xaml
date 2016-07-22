@@ -19,16 +19,13 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="258*"/>
+                <ColumnDefinition Width="259*"/>
             </Grid.ColumnDefinitions>
             <Image x:Name="elevationMapImage"/>
-            <Image x:Name="waterMapImage" Grid.Column="1"/>
-            <Image x:Name="colorMapImage" Grid.Column="2"/>
+            <Image x:Name="colorMapImage" Grid.Column="1"/>
             <Button x:Name="heightMapButton" Content="Load Elevation Map" HorizontalAlignment="Stretch" Margin="10" Height="auto" Click="heightMapButton_Click" Grid.Row="1"/>
-            <Button x:Name="waterMapButton" Content="Load Water Map" HorizontalAlignment="Stretch" Margin="10" Height="auto" Click="waterMapButton_Click" Grid.Row="1" Grid.Column="1"/>
-            <Button x:Name="colorMapButton" Content="Load Color Map" HorizontalAlignment="Stretch" Margin="10" Height="auto" Click="colorMapButton_Click" Grid.Row="1" Grid.Column="2"/>
+            <Button x:Name="colorMapButton" Content="Load Color Map" HorizontalAlignment="Stretch" Margin="10" Height="auto" Click="colorMapButton_Click" Grid.Row="1" Grid.Column="1"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

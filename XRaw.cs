@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Windows.Media;
@@ -77,21 +78,13 @@ namespace Voxel_Fortress
                 _voxels[z][x, y] = index;
         }
 
-        public void SetHeight(Color color, int x, int y, int z)
+        public void SetColumn(Color color, int x, int y, int zMin, int zMax)
         {
             short index = (short)_palette.IndexAdd(color);
-            int surface = z + 1;
-            for (int zz = 0; zz < surface; zz++)
-                SetIndex(x, y, zz, index);
-            if (surface < 100)
-            {
-                short waterIndex = (short)_palette.IndexAdd(Color.FromArgb(128, 0, 128, 128));
-                for (int zz = surface; zz < 100; zz++)
-                    SetIndex(x, y, zz, waterIndex);
-                surface = 100;
-            }
-            for (int zz = surface; zz < Height; zz++)
+            for (int zz = 0; zz < Height; zz++)
                 ClearVoxel(x, y, zz);
+            for (int zz = zMin; zz <= zMax; zz++)
+                SetIndex(x, y, zz, index);
         }
 
         public bool Resize(int width, int length, int height)
@@ -136,7 +129,7 @@ namespace Voxel_Fortress
                 _voxels[z][x, y] = ~0;
         }
 
-        public void SaveFile(string path)
+        public void SaveFile(string path, object sender)
         {
             BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create), Encoding.ASCII);
 
@@ -152,12 +145,14 @@ namespace Voxel_Fortress
             writer.Write(_palette.Count); //number of palette colors
 
             //End of Header
-            foreach (var layer in _voxels)
+            for (int i = 0; i < _voxels.Length; i++)
             {
-                foreach (var index in layer)
+                foreach (var index in _voxels[i])
                 {
-                    writer.Write((short)index);
+                    writer.Write(index);
                 }
+                writer.Flush();
+                (sender as BackgroundWorker).ReportProgress(i * 2048 / _voxels.Length, "Saving " + path);
             }
 
             foreach (Color color in _palette)
@@ -167,7 +162,7 @@ namespace Voxel_Fortress
                 writer.Write(color.B);
                 writer.Write(color.A);
             }
-            writer.Dispose();
+            writer.Close();
         }
     }
 }

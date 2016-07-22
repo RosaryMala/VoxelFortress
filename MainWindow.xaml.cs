@@ -64,24 +64,6 @@ namespace Voxel_Fortress
             exportLabel.Text = e.UserState as string;
         }
 
-        private void waterMapButton_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog heightMapDialog = new OpenFileDialog();
-
-            heightMapDialog.Filter = "Image Files (*.png, *.bmp, *.jpg)|*.png;*.bmp;*.jpg;*.jpeg|All Files (*.*)|*.*";
-
-            if (heightMapDialog.ShowDialog() == true)
-            {
-                //imageFileName = heightMapDialog.FileName;
-                BitmapImage waterMap = new BitmapImage(new Uri(heightMapDialog.FileName));
-
-                mapImages.waterMap = MapMaker.ConvertBitmapImage(waterMap);
-
-                waterMapImage.Source = waterMap;
-                //exportButton.IsEnabled = true;
-            }
-        }
-
         private void colorMapButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog heightMapDialog = new OpenFileDialog();
@@ -90,13 +72,14 @@ namespace Voxel_Fortress
 
             if (heightMapDialog.ShowDialog() == true)
             {
-                //imageFileName = heightMapDialog.FileName;
+                mapImages.imageFilename = heightMapDialog.FileName;
+
                 BitmapImage colorMap = new BitmapImage(new Uri(heightMapDialog.FileName));
 
                 mapImages.colorMap = MapMaker.ConvertBitmapImage(colorMap);
 
                 colorMapImage.Source = colorMap;
-                //exportButton.IsEnabled = true;
+                exportButton.IsEnabled = true;
             }
         }
     }
