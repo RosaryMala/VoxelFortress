@@ -34,8 +34,11 @@ namespace Voxel_Fortress
             return false;
         }
 
-        int[,] LoadElevations( Color[,] elevationMap, object sender)
+        int[,] LoadElevations( Color[,] elevationMap, object sender, out int min, out int max)
         {
+            min = int.MaxValue;
+            max = int.MinValue;
+
             int[,] elevations = new int[elevationMap.GetLength(0), elevationMap.GetLength(1)];
 
             for (int x = 0; x < elevationMap.GetLength(0); x++)
@@ -46,6 +49,8 @@ namespace Voxel_Fortress
                         elevations[x, y] = elevationMap[x, y].B;
                     else
                         elevations[x, y] = elevationMap[x, y].B + 25;
+                    min = Math.Min(min, elevations[x, y]);
+                    max = Math.Max(max, elevations[x, y]);
                 }
                 (sender as BackgroundWorker).ReportProgress(x * 2048 / elevationMap.GetLength(0), string.Format("Loading Heightmap: {0} of {1}", x, elevationMap.GetLength(0)));
             }
@@ -53,8 +58,11 @@ namespace Voxel_Fortress
             return elevations;
         }
 
-        int[,] LoadWaterElevations(Color[,] elevationMap, object sender)
+        int[,] LoadWaterElevations(Color[,] elevationMap, object sender, out int min, out int max)
         {
+            min = int.MaxValue;
+            max = int.MinValue;
+
             int[,] elevations = new int[elevationMap.GetLength(0), elevationMap.GetLength(1)];
 
             for (int x = 0; x < elevationMap.GetLength(0); x++)
@@ -62,16 +70,13 @@ namespace Voxel_Fortress
                 for (int y = 0; y < elevationMap.GetLength(1); y++)
                 {
                     if (elevationMap[x, y].R > 0)
-                    {
                         elevations[x, y] = elevationMap[x, y].B + 25; //This means it's not water.
-                        continue;
-                    }
-                    if (elevationMap[x, y].G > 0)
-                    {
+                    else if (elevationMap[x, y].G > 0)
                         elevations[x, y] = elevationMap[x, y].B; //Rivers
-                        continue;
-                    }
-                    elevations[x, y] = elevationMap[x, y].B + 25;
+                    else
+                        elevations[x, y] = elevationMap[x, y].B + 25;
+                    min = Math.Min(min, elevations[x, y]);
+                    max = Math.Max(max, elevations[x, y]);
                 }
                 (sender as BackgroundWorker).ReportProgress(x * 2048 / elevationMap.GetLength(0), string.Format("Loading Water: {0} of {1}", x, elevationMap.GetLength(0)));
             }
@@ -103,15 +108,21 @@ namespace Voxel_Fortress
             {
                 Images images = (Images)e.Argument;
 
+                int min, max;
+
                 if (images.elevationMap != null)
                 {
                     if (IsWaterMap(images.elevationMap))
-                        landElevations = LoadWaterElevations(images.elevationMap, sender);
+                        landElevations = LoadWaterElevations(images.elevationMap, sender, out min, out max);
                     else
-                        landElevations = LoadElevations(images.elevationMap, sender);
+                        landElevations = LoadElevations(images.elevationMap, sender, out min, out max);
                 }
                 else if (images.colorMap != null)
+                {
                     landElevations = new int[images.colorMap.GetLength(0), images.colorMap.GetLength(1)];
+                    min = 0;
+                    max = 0;
+                }
                 else return; //nothing to work with.
 
                 int voxelWidth = landElevations.GetLength(0);
@@ -138,9 +149,9 @@ namespace Voxel_Fortress
                         if (y < voxelLength - 1)
                             zMin = Math.Min(zMin, landElevations[x, y + 1]);
                         if (images.colorMap != null)
-                            voxels.SetColumn(images.colorMap[x, y], x, y, zMin, landElevations[x, y]);
+                            voxels.SetColumn(images.colorMap[x, y], x, y, zMin - min, landElevations[x, y] - min);
                         else
-                            voxels.SetColumn(Colors.White, x, y, zMin, landElevations[x, y]);
+                            voxels.SetColumn(Colors.White, x, y, zMin - min, landElevations[x, y] - min);
                     }
                     (sender as BackgroundWorker).ReportProgress(x * 2048 / voxelWidth, string.Format("Generating Voxels: {0} of {1}", x, voxelWidth));
                 }

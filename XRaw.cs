@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Windows;
 using System.Windows.Media;
 
 namespace Voxel_Fortress
@@ -131,6 +132,10 @@ namespace Voxel_Fortress
 
         public void SaveFile(string path, object sender)
         {
+            bool lowColor = _palette.Count < 256;
+
+
+
             BinaryWriter writer = new BinaryWriter(File.Open(path, FileMode.Create), Encoding.ASCII);
 
             //Beginning of Header
@@ -138,21 +143,49 @@ namespace Voxel_Fortress
             writer.Write((byte)0); //Unsigned Int channels
             writer.Write((byte)4); //RGBA
             writer.Write((byte)8); //Bits per channel
-            writer.Write((byte)16); //Bits per index
+            if (lowColor)
+                writer.Write((byte)8); //Bits per index
+            else
+                writer.Write((byte)16); //Bits per index
             writer.Write(_width); //x
             writer.Write(_length); //y
             writer.Write(_height); //z
-            writer.Write(_palette.Count); //number of palette colors
+            if (lowColor)
+                writer.Write(256); //Force 256 colors
+            else
+                writer.Write(_palette.Count); //number of palette colors
+
+            long count = 0;
 
             //End of Header
             for (int i = 0; i < _voxels.Length; i++)
             {
                 foreach (var index in _voxels[i])
                 {
-                    writer.Write(index);
+                    if (lowColor)
+                    {
+                        if (index == ~0)
+                            writer.Write((byte)0);
+                        else
+                        {
+                            writer.Write((byte)(index + 1));
+                            count++;
+                        }
+                    }
+                    else
+                    {
+                        writer.Write(index);
+                        if (index != ~0)
+                            count++;
+                    }
                 }
                 writer.Flush();
                 (sender as BackgroundWorker).ReportProgress(i * 2048 / _voxels.Length, "Saving " + path);
+            }
+
+            if(lowColor) //add an empty color in the beginning
+            {
+                writer.Write(Encoding.ASCII.GetBytes("FAKE"));
             }
 
             foreach (Color color in _palette)
@@ -162,7 +195,13 @@ namespace Voxel_Fortress
                 writer.Write(color.B);
                 writer.Write(color.A);
             }
+
+            for(int i = _palette.Count; i < 255;i++)
+            {
+                writer.Write(Encoding.ASCII.GetBytes("FAKE"));
+            }
             writer.Close();
+            MessageBox.Show(string.Format("Saved {0}\nUsing {1} unique colors, and {2} total voxels.", path, _palette.Count, count));
         }
     }
 }
