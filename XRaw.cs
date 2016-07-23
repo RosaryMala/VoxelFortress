@@ -84,8 +84,11 @@ namespace Voxel_Fortress
             short index = (short)_palette.IndexAdd(color);
             for (int zz = 0; zz < Height; zz++)
                 ClearVoxel(x, y, zz);
-            for (int zz = zMin; zz <= zMax; zz++)
-                SetIndex(x, y, zz, index);
+            if (zMin == zMax)
+                SetIndex(x, y, zMax, index);
+            else
+                for (int zz = zMin + 1; zz <= zMax; zz++)
+                    SetIndex(x, y, zz, index);
         }
 
         public bool Resize(int width, int length, int height)
